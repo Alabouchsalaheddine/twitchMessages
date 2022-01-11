@@ -1,11 +1,10 @@
 import socket
-import logging
 from emoji import demojize
 import re
 def get_chat_dataframe(userMessage):
-    data = []
     try:
         pattern = re.compile(":(.*)\!.*@.*\.tmi\.twitch\.tv PRIVMSG #(.*) :(.*)")
+        # We check if the response match the pattern of a user message
         if pattern.match(userMessage) :
             print(userMessage)
             username, channel, message = re.search(
@@ -17,10 +16,7 @@ def get_chat_dataframe(userMessage):
             'username': username,
             'message': str(message).replace("\r", "")
             }
-
-            data.append(d)
-            print(data)
-
+            print(d)
     except Exception:
         pass
 
@@ -41,7 +37,6 @@ def main():
     sock.send(f"PASS {token}\r\n".encode('utf-8'))
     sock.send(f"NICK {nickname}\r\n".encode('utf-8'))
     sock.send(f"JOIN {channel}\r\n".encode('utf-8'))
-
     try:
         while True:
             resp = sock.recv(2048).decode('utf-8')
@@ -50,7 +45,6 @@ def main():
                 sock.send("PONG\n".encode('utf-8'))
             elif len(resp) > 0:
                 get_chat_dataframe(demojize(resp))
-                logging.info(demojize(resp))
     except KeyboardInterrupt:
         sock.close()
         exit()
